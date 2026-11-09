@@ -39,6 +39,18 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (!menuOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const closeOnEscape = (event) => { if (event.key === "Escape") setMenuOpen(false); };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [menuOpen]);
+
+  useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const lenis = new Lenis({ autoRaf: false, smoothWheel: true, lerp: 0.09, wheelMultiplier: 0.9, anchors: true });
     let animationFrame;
@@ -72,8 +84,8 @@ function App() {
     {preloader && <div className="preloader" aria-hidden="true"><strong>MP<span>.</span></strong><i /></div>}
     <header className="navbar">
       <a className="brand" href="#home" onClick={closeMenu} aria-label="Manahil Pakeeza home"><img className="brand-logo" src="/logo.png" alt="Manahil Pakeeza" /></a>
-      <button className="nav-toggle" onClick={() => setMenuOpen((open) => !open)} aria-label="Toggle navigation" aria-expanded={menuOpen}>{menuOpen ? <X /> : <Menu />}</button>
-      <nav className={menuOpen ? "nav-links open" : "nav-links"} aria-label="Main navigation">
+      <button className="nav-toggle" onClick={() => setMenuOpen((open) => !open)} aria-label="Toggle navigation" aria-expanded={menuOpen} aria-controls="main-navigation">{menuOpen ? <X /> : <Menu />}</button>
+      <nav id="main-navigation" className={menuOpen ? "nav-links open" : "nav-links"} aria-label="Main navigation">
         {navItems.map(([label, id], index) => <a style={{ "--nav-index": index }} className={active === id ? "active" : ""} key={id} href={`#${id}`} onClick={closeMenu}>{label}</a>)}
         <a className="button button-small" href="#contact" onClick={closeMenu}>Hire me <ArrowUpRight size={15} aria-hidden="true" /></a>
         <div className="social-links"><a href="https://github.com/ManahilPkz" aria-label="GitHub" target="_blank" rel="noreferrer"><Github size={17} aria-hidden="true" /></a><a href="https://linkedin.com/in/manahil-pakeeza" aria-label="LinkedIn" target="_blank" rel="noreferrer"><Linkedin size={17} aria-hidden="true" /></a></div>
@@ -83,6 +95,7 @@ function App() {
 
     <main>
       <div className="hero-highlights-bg">
+      <img className="hero-highlights-image" src="/images/hero-bg.webp" alt="" aria-hidden="true" width="1672" height="941" fetchPriority="high" decoding="async" />
       <section className="hero section-wrap" id="home">
         <div className="hero-copy">
           <p className="eyebrow reveal">Hello, I am Manahil Pakeeza</p>
